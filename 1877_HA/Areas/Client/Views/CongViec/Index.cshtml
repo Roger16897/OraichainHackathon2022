@@ -14,7 +14,43 @@
 </div>
 @section Header
 {
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <style>
+        label {
+            display: inline-block;
+            max-width: 100%;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+        .label-danger
+        {
+            background-color:orangered;
+            color:white;
+        }
+        .label-success {
+            background-color: #5cb85c;
+        }
+
+        .label-success[href]:hover,
+        .label-success[href]:focus {
+            background-color: #449d44;
+        }
+        .label-danger {
+            background-color: #d9534f;
+        }
+
+        .label-danger[href]:hover,
+        .label-danger[href]:focus {
+            background-color: #c9302c;
+        }
+        .label-warning {
+            background-color: #f0ad4e;
+        }
+
+        .label-warning[href]:hover,
+        .label-warning[href]:focus {
+            background-color: #ec971f;
+        }
+    </style> 
 }
 @section Scripts
 {
