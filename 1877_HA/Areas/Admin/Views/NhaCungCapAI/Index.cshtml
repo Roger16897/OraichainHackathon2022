@@ -1,0 +1,115 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="page-header">
+    <h3 class="page-title">
+        <span class="page-title-icon bg-gradient-primary text-white mr-2">
+            <i class="mdi mdi-earth"></i>
+        </span> Danh sách nhà cung cấp AI
+    </h3>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <section class="panel">
+            <div id="grid"></div>
+        </section>
+    </div>
+</div>
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+            const dataGrid = $('#grid').dxDataGrid({
+                dataSource: DevExpress.data.AspNet.createStore({
+                    key: "ID",
+                    loadUrl: "/api/ApiNhaCungCapAI/Get",
+                    insertUrl: "/api/ApiNhaCungCapAI/Post",
+                    updateUrl: "/api/ApiNhaCungCapAI/Put",
+                    deleteUrl: "/api/ApiNhaCungCapAI/Delete",
+                    onBeforeSend: function (method, ajaxOptions) {
+                        ajaxOptions.xhrFields = {
+                            withCredentials: true
+                        };
+                    }
+                }),
+                selection: {
+                    mode: 'single',
+                },
+                remoteOperations: true,
+                rowAlternationEnabled: true,
+                filterRow: {
+                    visible: true
+                },
+                headerFilter: {
+                    visible: true
+                },
+                groupPanel: {
+                    visible: true
+                },
+                paging: {
+
+                    pageSize: 10
+                },
+                pager: {
+                    visible: true,
+                    allowedPageSizes: [5, 10, 20],
+                    showPageSizeSelector: true,
+                    showInfo: true,
+                    showNavigationButtons: true
+                },
+                showBorders: true,
+                editing: {
+                    allowAdding: true,
+                    allowUpdating: true,
+                    allowDeleting: true,
+                    useIcons: true
+                },
+                grouping: {
+                    autoExpandAll: false
+                },
+                columns: [
+                    {
+                        caption: "STT",
+                        visibleIndex: 0,
+                        width: 60,
+                        allowEditing: false,
+                        allowSearch: false,
+                        cellTemplate: function (cellElement, cellInfo) {
+                            $("<div>").append(($('#grid').dxDataGrid("instance").option('paging.pageIndex') || 0) * $('#grid').dxDataGrid("instance").option('paging.pageSize') + cellInfo.rowIndex + 1).appendTo(cellElement);
+                        }
+                    },
+                    {
+                        dataField: 'TenNhaCungCap',
+                        caption: 'Tên nhà cung cấp',
+                    },
+                    {
+                        dataField: 'MoTa',
+                        caption: 'Mô tả',
+                    },
+                    {
+                        dataField: "ID_LoaiDichVu",
+                        caption: "Thuộc loại",
+                        width: 250,
+                        lookup: {
+                            dataSource: DevExpress.data.AspNet.createStore({
+                                key: "ID",
+                                loadUrl: "/api/ApiNhaCungCapAI/tb_LoaiDichVuLookup",
+                                onBeforeSend: function (method, ajaxOptions) {
+                                    ajaxOptions.xhrFields = { withCredentials: true };
+                                }
+                            }),
+                            displayExpr: "TenLoaiDichVu",
+                            valueExpr: "ID"
+                        }
+                    },
+
+                ]
+            });
+        });
+
+    </script>
+}
+

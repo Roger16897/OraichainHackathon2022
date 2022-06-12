@@ -1,0 +1,116 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Client/Views/Shared/_LayoutClient.cshtml";
+}
+<br />
+<h4>Danh mục các yêu cầu</h4>
+<div class="row">
+    <div class="col-md-12">
+        <section class="panel">
+            <div id="grid"></div>
+        </section>
+    </div>
+</div>
+@section Header
+{
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+}
+@section Scripts
+{
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#grid').dxDataGrid({
+                dataSource: DevExpress.data.AspNet.createStore({
+                    key: "ID",
+                    loadUrl: "/api/ApiCongViec/Get",
+                    onBeforeSend: function (method, ajaxOptions) {
+                        ajaxOptions.xhrFields = {
+                            withCredentials: true
+                        };
+                    }
+                }),
+                remoteOperations: true,
+
+                showBorders: true,
+                selection: {
+                    mode: 'single',
+                },
+                onSelectionChanged(e) {
+                    e.component.collapseAll(-1);
+                    e.component.expandRow(e.currentSelectedRowKeys[0]);
+                },
+                onContentReady(e) {
+                    if (!e.component.getSelectedRowKeys().length) { e.component.selectRowsByIndexes(0); }
+                },
+                columns: [
+
+                    {
+                        dataField: 'TenKetQua',
+                        caption: 'Tên kết quả',
+                        width: 300,
+                    },
+                    {
+                        dataField: 'TenChuyenGia',
+                        caption: 'Tên chuyên gia',
+                    },
+                    {
+                        dataField: 'TenDichVu',
+                        caption: 'Tên dịch vụ',
+                    },
+                    {
+                        dataField: 'TenDichVu',
+                        caption: 'Thuộc loại dịch vụ',
+                    },
+                    {
+                        dataField: 'TrangThaiChuyenGia',
+                        caption: 'Trạng thái xử lý',
+                        alignment: 'center',
+                        width: 150,
+                        cellTemplate: function (container, options) {
+                            if (options.data.TrangThaiChuyenGia == "Chờ xử lý") {
+                                $('<label class="label label-danger">Chờ xử lý</label>')
+                                    .appendTo(container);
+                            }
+                            else if (options.data.TrangThaiChuyenGia == "Đang xử lý") {
+                                $('<label class="label label-warning">Đang xử lý</label>')
+                                    .appendTo(container);
+                            }
+                            else {
+                                $('<label class="label label-success">Hoàn thành</label>')
+                                    .appendTo(container);
+                            }
+
+                        }
+                    },
+                    {
+                        dataField: 'Hash',
+                        caption: 'Hash',
+                    },
+
+                ],
+                masterDetail: {
+                    enabled: false,
+                    template(container, options) {
+                        const congviec = options.data;
+                        var ketqua = congviec.KetQuaChuyenGia;
+                        if (ketqua == null) {
+                            ketqua = "Chưa có kết quả";
+                        }
+                        container.append($(`<div class="row">
+                                                            <div class="col-sm-4">Kết quả phản hồi của chuyên gia: </div>
+                                                            <div class="col-sm-8">
+                                                                <b>`+ ketqua + `</b>
+                                                            </div>
+                                                          </div>`));
+
+                    },
+                },
+            });
+
+        });
+
+    </script>
+}
+

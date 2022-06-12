@@ -1,0 +1,173 @@
+﻿
+@{
+    ViewBag.Title = "DanhSachYeuCau";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="page-header">
+    <h3 class="page-title">
+        <span class="page-title-icon bg-gradient-primary text-white mr-2">
+            <i class="mdi mdi-book-open-page-variant"></i>
+        </span> Danh sách yêu cầu
+    </h3>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <section class="panel">
+            <div id="grid"></div>
+        </section>
+    </div>
+</div>
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+            var trangthaicongviec = [
+                {
+                    "Text": "Chờ xử lý",
+                    "Value": "Chờ xử lý"
+                },
+                {
+                    "Text": "Đang xử lý",
+                    "Value": "Đang xử lý"
+                },
+                {
+                    "Text": "Hoàn thành",
+                    "Value": "Hoàn thành"
+                }];
+            const dataGrid = $('#grid').dxDataGrid({
+                dataSource: DevExpress.data.AspNet.createStore({
+                    key: "ID",
+                    loadUrl: "/api/ApiAdminCongViec/Get",
+                    insertUrl: "/api/ApiAdminCongViec/Post",
+                    updateUrl: "/api/ApiAdminCongViec/Put",
+                    deleteUrl: "/api/ApiAdminCongViec/Delete",
+                    onBeforeSend: function (method, ajaxOptions) {
+                        ajaxOptions.xhrFields = {
+                            withCredentials: true
+                        };
+                    }
+                }),
+                paging: {
+
+                    pageSize: 10
+                },
+                pager: {
+                    visible: true,
+                    allowedPageSizes: [5, 10, 20],
+                    showPageSizeSelector: true,
+                    showInfo: true,
+                    showNavigationButtons: true
+                },
+                editing: {
+                    allowAdding: false,
+                    allowUpdating: true,
+                    allowDeleting: false,
+                    useIcons: true
+                },
+
+
+                remoteOperations: true,
+
+                showBorders: true,
+                selection: {
+                    mode: 'single',
+                },
+                onSelectionChanged(e) {
+                    e.component.collapseAll(-1);
+                    e.component.expandRow(e.currentSelectedRowKeys[0]);
+                },
+                onContentReady(e) {
+                    if (!e.component.getSelectedRowKeys().length) { e.component.selectRowsByIndexes(0); }
+                },
+
+                columns: [
+                    {
+                        caption: "STT",
+                        visibleIndex: 0,
+                        width: 60,
+                        alignment: 'center',
+                        allowEditing: false,
+                        allowSearch: false,
+                        cellTemplate: function (cellElement, cellInfo) {
+                            $("<div>").append(($('#grid').dxDataGrid("instance").option('paging.pageIndex') || 0) * $('#grid').dxDataGrid("instance").option('paging.pageSize') + cellInfo.rowIndex + 1).appendTo(cellElement);
+                        }
+                    },
+                    {
+                        dataField: 'TenKetQua',
+                        caption: 'Tên kết quả',
+                        allowEditing: false,
+                    },
+                    {
+                        dataField: 'TenDayDu',
+                        caption: 'Thuộc khách hàng',
+                        allowEditing: false,
+                    },
+                    {
+                        dataField: 'TenDichVu',
+                        caption: 'Tên dịch vụ',
+                        allowEditing: false,
+                    },
+                    //{
+                    //    dataField: 'KetQuaNhaCungCapAI',
+                    //    caption: 'Kết quả của nhà cc AI',
+                    //    allowEditing: false,
+                    //},
+                    {
+                        dataField: 'KetQuaChuyenGia',
+                        caption: 'Kết quả chuyên gia',
+                    },
+                    {
+                        dataField: 'Hash',
+                        caption: 'Hash',
+                        allowEditing: false,
+                    },
+                    {
+                        dataField: "TrangThaiChuyenGia",
+                        caption: "Trạng thái chuyên gia",
+                        lookup: {
+                            dataSource: trangthaicongviec,
+                            displayExpr: "Text",
+                            valueExpr: "Value"
+                        },
+                        alignment: 'center',
+                        width: 150,
+                        cellTemplate: function (container, options) {
+                            if (options.data.TrangThaiChuyenGia == "Chờ xử lý") {
+                                $('<label class="badge badge-gradient-danger">Chờ xử lý</label>')
+                                    .appendTo(container);
+                            }
+                            else if (options.data.TrangThaiChuyenGia == "Đang xử lý") {
+                                $('<label class="badge badge-gradient-warning"">Đang xử lý</label>')
+                                    .appendTo(container);
+                            }
+                            else {
+                                $('<label class="badge badge-gradient-success">Hoàn thành</label>')
+                                    .appendTo(container);
+                            }
+
+                        }
+                    },
+
+
+                ],
+                masterDetail: {
+                    enabled: false,
+                    template(container, options) {
+                        const yeucau = options.data;
+                        container.append($(`<div class="row">
+                                                <div class="col-sm-2">
+                                                    Kết quả nhà phân tích AI
+                                                </div>
+                                                <div class="col-sm-10">
+                                                    <textarea class="form-control" style="height:100px">`+ yeucau.KetQuaNhaCungCapAI + `</textarea>
+                                                </div>
+                                              </div>`));
+
+                    },
+                },
+            });
+        });
+
+    </script>
+}

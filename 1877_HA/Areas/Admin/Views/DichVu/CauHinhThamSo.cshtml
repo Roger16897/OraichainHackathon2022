@@ -1,0 +1,115 @@
+﻿
+@{
+    ViewBag.Title = "CauHinhThamSo";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="page-header">
+    <h3 class="page-title">
+        <span class="page-title-icon bg-gradient-primary text-white mr-2">
+            <i class="mdi mdi-settings"></i>
+        </span> Cấu hình tham số dịch vụ khai thác
+    </h3>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <section class="panel">
+            <div id="grid"></div>
+        </section>
+    </div>
+</div>
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+            const dataGrid = $('#grid').dxDataGrid({
+                dataSource: DevExpress.data.AspNet.createStore({
+                    key: "ID",
+                    loadUrl: "/api/ApiCauHinhThamSo/Get",
+                    insertUrl: "/api/ApiCauHinhThamSo/Post",
+                    updateUrl: "/api/ApiCauHinhThamSo/Put",
+                    deleteUrl: "/api/ApiCauHinhThamSo/Delete",
+                    onBeforeSend: function (method, ajaxOptions) {
+                        ajaxOptions.xhrFields = {
+                            withCredentials: true
+                        };
+                    }
+                }),
+                selection: {
+                    mode: 'single',
+                },
+                remoteOperations: true,
+                rowAlternationEnabled: true,
+                filterRow: {
+                    visible: true
+                },
+                headerFilter: {
+                    visible: true
+                },
+                groupPanel: {
+                    visible: true
+                },
+                paging: {
+
+                    pageSize: 10
+                },
+                pager: {
+                    visible: true,
+                    allowedPageSizes: [5, 10, 20],
+                    showPageSizeSelector: true,
+                    showInfo: true,
+                    showNavigationButtons: true
+                },
+                showBorders: true,
+                editing: {
+                    allowAdding: true,
+                    allowUpdating: true,
+                    allowDeleting: true,
+                    useIcons: true
+                },
+                grouping: {
+                    autoExpandAll: false
+                },
+                columns: [
+                    {
+                        caption: "STT",
+                        visibleIndex: 0,
+                        width: 60,
+                        allowEditing: false,
+                        allowSearch: false,
+                        cellTemplate: function (cellElement, cellInfo) {
+                            $("<div>").append(($('#grid').dxDataGrid("instance").option('paging.pageIndex') || 0) * $('#grid').dxDataGrid("instance").option('paging.pageSize') + cellInfo.rowIndex + 1).appendTo(cellElement);
+                        }
+                    },
+                    {
+                        dataField: 'TenTruong',
+                        caption: 'Tên cấu hình',
+                    },
+                    {
+                        dataField: 'MoTa',
+                        caption: 'Mô tả',
+                    },
+                    {
+                        dataField: "ID_DichVu",
+                        caption: "Thuộc dịch vụ",
+                        width: 200,
+                        lookup: {
+                            dataSource: DevExpress.data.AspNet.createStore({
+                                key: "Value",
+                                loadUrl: "/api/ApiCauHinhThamSo/tb_DichVuLookup",
+                                onBeforeSend: function (method, ajaxOptions) {
+                                    ajaxOptions.xhrFields = { withCredentials: true };
+                                }
+                            }),
+                            displayExpr: "Text",
+                            valueExpr: "Value"
+                        }
+                    }
+
+                ]
+            });
+        });
+
+    </script>
+}
+

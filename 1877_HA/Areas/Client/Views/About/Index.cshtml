@@ -1,0 +1,53 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Client/Views/Shared/_LayoutClient.cshtml";
+}
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+            $("#id_hotro_client").addClass("active");
+        })
+    </script>
+}
+<div class="about-us">
+    <div class="">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="left-image">
+                    <img src="~/Assets/Client/images/ai_oraichain.png" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="right-content">
+                    <div class="section-heading">
+                        <h2>Giới thiệu</h2>
+                        <p>Thị trường dịch vụ AI kết hợp chuyên gia trên nền tảng Oraichain Blockchain</p>
+                    </div>
+                    <div id="tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
+                        <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" role="tablist">
+                            <li class="ui-state-default ui-corner-top ui-tabs-active ui-state-active" role="tab" tabindex="0" aria-controls="tabs-1" aria-labelledby="ui-id-1" aria-selected="true" aria-expanded="true"><a href="#tabs-1" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-1">Sản phẩm</a></li>
+                            <li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-2" aria-labelledby="ui-id-2" aria-selected="false" aria-expanded="false"><a href="#tabs-2" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-2">Team phát triển</a></li>
+                        </ul>
+                        <section class="tabs-content">
+                            <article id="tabs-1" aria-labelledby="ui-id-1" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-hidden="false" style="">
+                                <p>
+                                    Sản phẩm được ra đời với mong muốn giải quyết các bài toán khó, hỗ trợ chuyên gia trong việc ra quyết định.
+                                    <br><br>Sản phẩm được kết hợp giữa công nghệ trí tuệ nhân tạo (AI) và công nghệ Blockchain.
+                                </p>
+                            </article>
+                            <article id="tabs-2" aria-labelledby="ui-id-2" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-hidden="true" style="display: none;">
+                                <p>
+                                    Được phát triển bởi 1877 Team!
+                                </p>
+                            </article>
+
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,74 @@
+﻿@model IEnumerable<_1877_HA.Models.DichVu>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Client/Views/Shared/_LayoutClient.cshtml";
+}
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+            $("#id_dichvu_client").addClass("active");
+        })
+    </script>
+}
+<br />
+<h4>Danh mục dịch vụ</h4>
+
+<div class="row">
+    @{
+        int temp = 0;
+        foreach (var item in Model)
+        {
+
+            <div class="col-md-4 col-sm-6 col-xs-12">
+                <div class="pricing-item">
+                    <h4>@Html.DisplayFor(modelItem => item.TenDichVu)</h4>
+                    <div class="price @(temp%2==1?"price-gradient":"")">
+                        <h6>@Html.DisplayFor(modelItem => item.Gia)</h6>
+                    </div>
+                    <p style="height:40px">@Html.DisplayFor(modelItem => item.MoTa)</p>
+                    <div class="dev"></div>
+                    <ul>
+                        @if (temp % 3 == 0)
+                        {
+                            <li><i class="fa fa-check"></i>Độ chính xác trung bình: 88% </li>
+                        }
+                        else if (temp % 3 == 1)
+                        {
+                            <li><i class="fa fa-check"></i>Độ chính xác trung bình: 86% </li>
+                        }
+                        else
+                        {
+                            <li><i class="fa fa-check"></i>Độ chính xác trung bình: 91% </li>
+                        }
+                        <li><i class="fa fa-check"></i>Thuộc loại dịch vụ: @Html.DisplayFor(modelItem => item.TenLoaiDichVu)</li>
+                        <li><i class="fa fa-check"></i>Thuộc nhà cung cấp: @Html.DisplayFor(modelItem => item.TenNhaCungCap)</li>
+
+                    </ul>
+                    <a href="#" class="@(temp%2==1?"gradient-button":"main-button")" id="id_luachon_@item.ID">Lựa chọn</a>
+                    <script>
+                        $(document).ready(function () {
+                            $('#id_luachon_@item.ID').click(function (e) {
+                                var id =@item.ID;
+                                window.location.href = "/Client/DichVu/ChiTietDichVu?id="+id;
+                                
+                            })
+                        })
+                    </script>
+                </div>
+            </div>
+           
+            temp++;
+            if (temp % 3 == 0)
+            {
+                
+                @:</div>
+                @:<div class="row" style="padding-top:40px">
+
+            }
+
+        }
+    }
+</div>
+
+

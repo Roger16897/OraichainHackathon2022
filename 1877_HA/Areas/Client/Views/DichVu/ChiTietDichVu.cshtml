@@ -1,0 +1,789 @@
+﻿
+@{
+    ViewBag.Title = "ChiTietDichVu";
+    Layout = "~/Areas/Client/Views/Shared/_LayoutClient.cshtml";
+}
+<br />
+@if (ViewBag.ID == 1)
+{
+    <div style="position:relative">
+        <div id="id_main_loading" style=" min-height: 400px; width:100%" class="shadow-lg p-3 mb-5 bg-white rounded">
+            <h4 style="color:darkviolet">Phân tích, chuẩn đoán thông tin các bệnh của phổi dựa vào AI</h4>
+            <div class="row">
+                <div class="col-sm-8">
+                    @*<input type="file" name="file" id="file" class="form-control" accept="*" />*@
+                    <input type="file" name="imgFile" id="imgFile" class="form-control" accept="image/png, image/jpeg, image/gif, image/jpg" /><br />
+                </div>
+                <div class="col-sm-4">
+                    <button type="button" class="btn btn-primary" id="id_phantich">Phân tích</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-8">
+                    <img width="100%" id="id_img_res" />
+                </div>
+                <div class="col-sm-4" id="id_chuandoanketqua" style="display:none">
+                    Chuẩn đoán kết quả:
+                    <div id="id_khongcobenh" style="display:none">Không có bệnh!</div>
+                    <div id="id_table_res" style="display:none">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">STT</th>
+                                    <th scope="col">Tên bệnh</th>
+                                    <th scope="col">Xác xuất</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <br />
+            <div class="row">
+                <div class="col-sm-8">
+                    <input type="text" placeholder="Tên kết quả" class="form-control" id="id_tenketqua" style="display:none" />
+                    <br />
+                    <button type="button" class="btn btn-primary" id="id_btn_taianh" style="display:none;float:left">Tải ảnh</button>
+                    <button type="button" class="btn btn-success" id="id_btn_luuketqua" style="display:none; float:right">Lưu kết quả</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <a id="id_link_ketqua"></a>
+                </div>
+            </div>
+        </div>
+        
+        <div id="id_wait_loading" class="centered" style="display:none">
+            <i class="fa fa-spinner fa-spin fa-5x" style="color:blueviolet"></i><br /><br />
+            <b>Đang xử lý...</b>
+        </div>
+    </div>
+
+    @section Scripts
+    {
+        <script>
+            $(document).ready(function () {
+                $("#id_dichvu_client").addClass("active");
+            })
+        </script>
+        <script src="~/Assets/Client/FileSaver.js"></script>
+        <script>
+        $(document).ready(function () {
+            var ketquaAI = "";
+            var txthash = "";
+            $('#id_phantich').click(function (e) {
+                //$("body").css("overflow", "hidden");
+                $("#id_main_loading").addClass('disabled'); 
+                $("#id_div_comment").addClass('disabled');
+                $("#id_wait_loading").css("display", "block");
+                ketquaAI = "";
+                var formData = new FormData();
+                formData.append("imgFile", $("#imgFile")[0].files[0]);
+                $.ajax({
+                    url: "/Client/DichVu/PhanTich",
+                    type: "POST",
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        if (response.status) {
+                            var url_image = "http://45.76.158.89:5000/download?filename=" + response.filename;
+                            ketquaAI += "image: " + url_image + "\n";
+                            ketquaAI += "Chuẩn đoán bệnh:\n";
+                            $('#id_img_res').attr('src', url_image);
+                            $("#id_btn_taianh").css("display", "block");
+                            $("#id_btn_luuketqua").css("display", "block");
+                            $("#id_tenketqua").css("display", "block");
+                            $("#id_chuandoanketqua").css("display", "block");
+                            var data = response.data;
+                            var json = JSON.parse(data);
+                            txthash = json["txHash"];
+                            var listbenh = JSON.parse(json["data"]);
+                            var tenbenh = listbenh["syms"];
+                            var xacxuat = listbenh["probabilities"];
+                            if (tenbenh.length == 0) {
+                                $("#id_khongcobenh").css("display", "block");
+                                ketquaAI += "Không có bệnh!\n";
+                            }
+                            else {
+                                $("#id_khongcobenh").css("display", "none");
+                                $("#id_table_res").css("display", "block");
+                                $(".table tbody").empty();
+
+                                for (i = 0; i < tenbenh.length; i++) {
+                                    ketquaAI += "Tên bệnh: " + tenbenh[i] + "- xác xuất: " + xacxuat[i].toFixed(3) + "\n";
+                                    $('.table tbody').append(
+                                        `<tr>
+                                                <th scope="row">`+ (i + 1) + `</th>
+                                                <td>`+ tenbenh[i] + `</td>
+                                                <td>`+ xacxuat[i].toFixed(3) + `</td>
+                                            </tr>`
+                                    );
+                                }
+                            }
+                        }
+                        else {
+                            alert('Có lỗi xảy ra trong quá trình xử lý, vui lòng thử lại!');
+                        }
+                        //dis the loading
+                        $("#id_main_loading").removeClass('disabled');
+                        $("#id_div_comment").removeClass('disabled');
+                        $("#id_wait_loading").css("display", "none");
+                        
+                    },
+                    error: function (error) {
+                        alert('Có lỗi xảy ra trong quá trình xử lý, vui lòng thử lại!');
+                    }
+                });
+            })
+
+            $('#id_btn_taianh').click(function () {
+                var imagePath = $('#id_img_res').prop('src');
+
+                var fileName = "download.png";
+                saveAs(imagePath, fileName);
+            });
+
+            $('#id_btn_luuketqua').click(function () {
+                //$("body").css("overflow", "hidden");
+                $("#id_main_loading").addClass('disabled');
+                $("#id_div_comment").addClass('disabled');
+                $("#id_wait_loading").css("display", "block");
+                var tenketqua = $('#id_tenketqua').val();
+                //var imagePath = $('#id_img_res').prop('src');
+                var idDichVu = @ViewBag.IDDichVu;
+                //alert(ketquaAI);
+                $.ajax({
+                    type: "POST",
+                    url: "/Client/DichVu/LuuKetQua",
+                    data: { iddv: idDichVu, ketquaAI: ketquaAI, tenketqua: tenketqua, haship: txthash },
+                    success: function (json) {
+                        //$("body").css("overflow", "auto");
+                        $("#id_main_loading").removeClass('disabled');
+                        $("#id_div_comment").removeClass('disabled');
+                        $("#id_wait_loading").css("display", "none");
+                        $("#id_link_ketqua").attr("href", json.hashop);
+                        $("#id_link_ketqua").text("Link kết quả");
+                        alert(json.mess);
+                    },
+                    error: function (error) {
+                        //$("body").css("overflow", "auto");
+                        $("#id_main_loading").removeClass('disabled');
+                        $("#id_div_comment").removeClass('disabled');
+                        $("#id_wait_loading").css("display", "none");
+
+                        alert('Có lỗi xảy ra trong quá trình xử lý, vui lòng thử lại!');
+                    }
+                })
+            });
+        })
+        </script>
+    }
+}
+else if (ViewBag.ID == 2)
+{
+    <div style="position:relative">
+        <div id="id_main_loading" style="min-height: 400px; width:100%" class="shadow-lg p-3 mb-5 bg-white rounded">
+            <h4 style="color:darkviolet">Phân tích, chuẩn đoán thông tin độ nghiêm trọng của phổi sau khi nhiễm covid</h4>
+            <div class="row">
+                <div class="col-sm-8">
+                    @*<input type="file" name="file" id="file" class="form-control" accept="*" />*@
+                    <input type="file" name="imgFile" id="imgFile" class="form-control" accept="image/png, image/jpeg, image/gif, image/jpg" /><br />
+                </div>
+                <div class="col-sm-4">
+                    <button type="button" class="btn btn-primary" id="id_phantich">Phân tích</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-8">
+                    <img width="100%" id="id_img_res" />
+                </div>
+                <div class="col-sm-4" id="id_chuandoanketqua" style="display:none">
+                    Chuẩn đoán kết quả:
+                    <div id="id_table_res" style="display:none">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">STT</th>
+                                    <th scope="col">Mức độ</th>
+                                    <th scope="col">Xác xuất</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-8">
+                    <input type="text" placeholder="Tên kết quả" class="form-control" id="id_tenketqua" style="display:none" />
+                    <br />
+                    <button type="button" class="btn btn-success" id="id_btn_luuketqua" style="display:none;">Lưu kết quả</button>
+                </div>
+            </div>
+
+        </div>
+        <div id="id_wait_loading" class="centered" style="display:none">
+            <i class="fa fa-spinner fa-spin fa-5x" style="color:blueviolet"></i><br /><br />
+            <b>Đang xử lý...</b>
+        </div>
+    </div>
+    @section Scripts
+    {
+        <script>
+            $(document).ready(function () {
+                $("#id_dichvu_client").addClass("active");
+            })
+        </script>
+        <script src="~/Assets/Client/FileSaver.js"></script>
+        <script>
+            $(document).ready(function () {
+                $("#imgFile").change(function () {
+                    var tgt = window.event.srcElement,
+                        files = tgt.files;
+                    // FileReader support
+                    if (FileReader && files && files.length) {
+                        var fr = new FileReader();
+                        fr.onload = function () {
+                            $("#id_img_res").attr("src", fr.result);
+                        }
+                        fr.readAsDataURL(files[0]);
+                    }
+                });
+
+
+                var ketquaAI = ""; var txthash = "";
+                $('#id_phantich').click(function (e) {
+                    $("#id_main_loading").addClass('disabled');
+                    $("#id_div_comment").addClass('disabled');
+                    $("#id_wait_loading").css("display", "block");
+                    ketquaAI = "";
+                    var formData = new FormData();
+                    formData.append("imgFile", $("#imgFile")[0].files[0]);
+                    $.ajax({
+                        url: "/Client/DichVu/PhanTichCovid",
+                        type: "POST",
+                        data: formData,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            if (response.status) {
+                                ketquaAI += "Chuẩn đoán bệnh:\n";
+                                $("#id_btn_luuketqua").css("display", "block");
+                                $("#id_tenketqua").css("display", "block");
+                                $("#id_chuandoanketqua").css("display", "block");
+                                var data = response.data;
+                                var json = JSON.parse(data);
+                                txthash = json["txHash"];
+                                var chuandoan = JSON.parse(json["data"]);
+                                var xacsuat = Number(chuandoan["confidence"]);
+                                var mucdo = chuandoan["serverity level"];
+                                $("#id_table_res").css("display", "block");
+                                $(".table tbody").empty();
+                                ketquaAI += "Mức độ: " + mucdo + "- xác xuất: " + xacsuat.toFixed(3) + "\n";
+                                $('.table tbody').append(
+                                    `<tr>
+                                                    <th scope="row">`+ 1 + `</th>
+                                                    <td>`+ mucdo + `</td>
+                                                    <td>`+ xacsuat.toFixed(3) + `</td>
+                                                </tr>`
+                                );
+                            }
+                            else {
+                                alert('Có lỗi xảy ra trong quá trình xử lý, vui lòng thử lại!');
+                            }
+                            $("#id_main_loading").removeClass('disabled');
+                            $("#id_div_comment").removeClass('disabled');
+                            $("#id_wait_loading").css("display", "none");
+                        },
+                        error: function (error) {
+                            alert('Có lỗi xảy ra trong quá trình xử lý, vui lòng thử lại!');
+                        }
+                    });
+                })
+
+                $('#id_btn_luuketqua').click(function () {
+                    //$("body").css("overflow", "hidden");
+                    $("#id_main_loading").addClass('disabled');
+                    $("#id_div_comment").addClass('disabled');
+                    $("#id_wait_loading").css("display", "block");
+                    var tenketqua = $('#id_tenketqua').val();
+                    //var imagePath = $('#id_img_res').prop('src');
+                    var idDichVu = @ViewBag.IDDichVu;
+                    //alert(ketquaAI);
+                    $.ajax({
+                        type: "POST",
+                        url: "/Client/DichVu/LuuKetQua",
+                        data: { iddv: idDichVu, ketquaAI: ketquaAI, tenketqua: tenketqua,haship: txthash },
+                        success: function (json) {
+                            //$("body").css("overflow", "auto");
+                            $("#id_main_loading").removeClass('disabled');
+                            $("#id_div_comment").removeClass('disabled');
+                            $("#id_wait_loading").css("display", "none");
+                            $("#id_link_ketqua").attr("href", json.hashop);
+                            $("#id_link_ketqua").text("Link kết quả");
+                            alert(json.mess);
+                        },
+                        error: function (error) {
+                            //$("body").css("overflow", "auto");
+                            $("#id_main_loading").removeClass('disabled');
+                            $("#id_div_comment").removeClass('disabled');
+                            alert('Có lỗi xảy ra trong quá trình xử lý, vui lòng thử lại!');
+                        }
+                    })
+                });
+            })
+        </script>
+    }
+}
+else if (ViewBag.ID == 3)
+{
+    <div style="position:relative">
+        <div id="id_main_loading" style="min-height: 400px; width:100%" class="shadow-lg p-3 mb-5 bg-white rounded">
+            <h4 style="color:darkviolet">Phân tích, chuẩn đoán thông tin file nghi ngờ nhiễm mã độc</h4>
+            <div class="row">
+                <div class="col-sm-8">
+                    @*<input type="file" name="file" id="file" class="form-control" accept="*" />*@
+                    <input type="file" name="malFile" id="malFile" class="form-control" accept="*" /><br />
+                </div>
+                <div class="col-sm-4">
+                    <button type="button" class="btn btn-primary" id="id_phantich">Phân tích</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-10" id="id_chuandoanketqua" style="display:none">
+                    Chuẩn đoán kết quả:
+                    <div id="id_table_res" style="display:none">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">STT</th>
+                                    <th scope="col">Tên file nghi ngờ</th>
+                                    <th scope="col">Kết quả</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-8">
+                    <input type="text" placeholder="Tên kết quả" class="form-control" id="id_tenketqua" style="display:none" />
+                    <br />
+                    <button type="button" class="btn btn-success" id="id_btn_luuketqua" style="display:none;">Lưu kết quả</button>
+                </div>
+            </div>
+        </div>
+        <div id="id_wait_loading" class="centered" style="display:none">
+            <i class="fa fa-spinner fa-spin fa-5x" style="color:blueviolet"></i><br /><br />
+            <b>Đang xử lý...</b>
+        </div>
+    </div>
+    @section Scripts
+    {
+        <script>
+            $(document).ready(function () {
+                $("#id_dichvu_client").addClass("active");
+            })
+        </script>
+        <script>
+            $(document).ready(function () {
+                var ketquaAI = ""; var txthash = "";
+                $('#id_phantich').click(function (e) {
+                    $("#id_main_loading").addClass('disabled');
+                    $("#id_div_comment").addClass('disabled');
+                    $("#id_wait_loading").css("display", "block");
+                    ketquaAI = "";
+                    var formData = new FormData();
+                    formData.append("malFile", $("#malFile")[0].files[0]);
+                    $.ajax({
+                        url: "/Client/DichVu/PhanTichMaDoc",
+                        type: "POST",
+                        data: formData,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            if (response.status) {
+                                ketquaAI += "Chuẩn đoán mã độc:\n";
+                                $("#id_btn_luuketqua").css("display", "block");
+                                $("#id_tenketqua").css("display", "block");
+                                $("#id_chuandoanketqua").css("display", "block");
+                                var data = response.data;
+                                ketquaAI = data;
+                                var json = JSON.parse(data);
+                                txthash = json["txHash"];
+                                var chuandoanmalware = JSON.parse(json["data"]);
+                                $("#id_table_res").css("display", "block");
+                                $(".table tbody").empty();
+                                var STT = 1;
+                                for (key in chuandoanmalware) {
+                                    //if (json.hasOwnProperty(key)) {
+                                    //    console.log("%c " + key + " = " + jsonParsedArray[key], "color:cyan");
+                                    //}
+                                    $('.table tbody').append(
+                                        `<tr>
+                                                    <th scope="row">`+ STT + `</th>
+                                                    <td>`+ key + `</td>
+                                                    <td>`+ chuandoanmalware[key] + `</td>
+                                                </tr>`
+                                    );
+                                    STT++;
+                                }
+                            }
+                            else {
+                                alert('Có lỗi xảy ra trong quá trình xử lý, vui lòng thử lại!');
+                            }
+                            $("#id_main_loading").removeClass('disabled');
+                            $("#id_div_comment").removeClass('disabled');
+                            $("#id_wait_loading").css("display", "none");
+                        },
+                        error: function (error) {
+                            alert('Có lỗi xảy ra trong quá trình xử lý, vui lòng thử lại!');
+                        }
+                    });
+                })
+
+                $('#id_btn_luuketqua').click(function () {
+                    //body").css("overflow", "hidden");
+                    $("#id_main_loading").addClass('disabled');
+                    $("#id_div_comment").addClass('disabled');
+                    $("#id_wait_loading").css("display", "block");
+                    var tenketqua = $('#id_tenketqua').val();
+                    //var imagePath = $('#id_img_res').prop('src');
+                    var idDichVu = @ViewBag.IDDichVu;
+                    //alert(ketquaAI);
+                    $.ajax({
+                        type: "POST",
+                        url: "/Client/DichVu/LuuKetQua",
+                        data: { iddv: idDichVu, ketquaAI: ketquaAI, tenketqua: tenketqua, haship: txthash },
+                        success: function (json) {
+                            //$("body").css("overflow", "auto");
+                            $("#id_main_loading").removeClass('disabled');
+                            $("#id_div_comment").removeClass('disabled');
+                            $("#id_wait_loading").css("display", "none");
+                            $("#id_link_ketqua").attr("href", json.hashop);
+                            $("#id_link_ketqua").text("Link kết quả");
+                            alert(json.mess);
+                        },
+                        error: function (error) {
+                            //$("body").css("overflow", "auto");
+                            $("#id_main_loading").removeClass('disabled');
+                            $("#id_div_comment").removeClass('disabled');
+                            alert('Có lỗi xảy ra trong quá trình xử lý, vui lòng thử lại!');
+                        }
+                    })
+                });
+            })
+        </script>
+    }
+}
+else
+{
+    <div class="trusted-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="trusted-section-heading">
+                        <h4>Không tìm thấy dịch vụ!</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section Header
+{
+    <style>
+        .disabled {
+            opacity: 0.2;
+        }
+        .centered {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            /* bring your own prefixes */
+            transform: translate(-50%, -50%);
+        }
+        .card {
+            border: 0px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            padding: 20px;
+            width: 450px;
+            word-wrap: break-word;
+            background-color: #fff;
+            background-clip: border-box;
+            border-radius: 6px;
+            -moz-box-shadow: 0px 0px 5px 0px rgba(212, 182, 212, 1)
+        }
+
+        .comment-box {
+            padding: 5px;
+        }
+
+
+
+        .comment-area textarea {
+            resize: none;
+            border: 1px solid #ad9f9f;
+        }
+
+
+        .form-control:focus {
+            color: #495057;
+            background-color: #fff;
+            border-color: #ffffff;
+            outline: 0;
+            box-shadow: 0 0 0 1px rgb(255, 0, 0) !important;
+        }
+
+        .send {
+            color: #fff;
+            background-color: #742297;
+            border-color: #742297;
+        }
+
+        .send:hover {
+            color: #fff;
+            background-color: #5c0d7e;
+            border-color: #5c0d7e;
+        }
+
+
+        .rating {
+            display: flex;
+            margin-top: -10px;
+            flex-direction: row-reverse;
+            margin-left: -4px;
+            float: left;
+        }
+
+        .rating > input {
+            display: none
+        }
+
+        .rating > label {
+            position: relative;
+            width: 19px;
+            font-size: 25px;
+            color: #742297;
+            cursor: pointer;
+        }
+
+        .rating > label::before {
+            content: "\2605";
+            position: absolute;
+            opacity: 0
+        }
+
+        .rating > label:hover:before,
+        .rating > label:hover ~ label:before {
+            opacity: 1 !important
+        }
+
+        .rating > input:checked ~ label:before {
+            opacity: 1
+        }
+
+        .rating:hover > input:checked ~ label:before {
+            opacity: 0.4
+        }
+    </style>
+    <style>
+        .container_comment {
+            background-color: #eef2f5;
+        }
+
+        .addtxt {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            text-align: center;
+            font-size: 13px;
+            width: 350px;
+            background-color: #e5e8ed;
+            font-weight: 500;
+        }
+
+        .form-control:focus {
+            color: #000;
+        }
+
+        .second {
+            width: 90%;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 10px 10px 5px #aaaaaa;
+        }
+
+        .text1 {
+            font-size: 14px;
+            font-weight: 500;
+            color: black;
+        }
+
+        .text2 {
+            font-size: 13px;
+            font-weight: 500;
+            margin-left: 6px;
+            color: #56575b;
+        }
+
+        .text3 {
+            font-size: 13px;
+            font-weight: 500;
+            margin-right: 4px;
+            color: #828386;
+        }
+
+        .text3o {
+            color: #00a5f4;
+        }
+
+        .text4 {
+            font-size: 13px;
+            font-weight: 500;
+            color: #828386;
+        }
+
+        .text4i {
+            color: #00a5f4;
+        }
+
+        .text4o {
+            color: white;
+        }
+
+        .thumbup {
+            font-size: 13px;
+            font-weight: 500;
+            margin-right: 5px;
+        }
+
+        .thumbupo {
+            color: #17a2b8;
+        }
+
+        .checked {
+            color: darkviolet;
+        }
+
+        .phanhoi {
+            float: right;
+            font-size: 11px;
+        }
+    </style>
+
+}
+<div id="id_div_comment" style="min-height: 400px; width:100%" class="shadow-lg p-3 mb-5 bg-white rounded">
+    <div class="row">
+        <div class="col-sm-6 card">
+            <div class="comment-box ml-2">
+                <h5>Đánh giá dịch vụ</h5>
+                <div class="rating">
+                    <input type="radio" name="rating" value="5" id="5"><label for="5">☆</label>
+                    <input type="radio" name="rating" value="4" id="4"><label for="4">☆</label>
+                    <input type="radio" name="rating" value="3" id="3"><label for="3">☆</label>
+                    <input type="radio" name="rating" value="2" id="2"><label for="2">☆</label>
+                    <input type="radio" name="rating" value="1" id="1"><label for="1">☆</label>
+                </div>
+                <div class="comment-area">
+                    <textarea class="form-control" id="id_noidungcmt" placeholder="Bình luận của bạn?" rows="4"></textarea>
+                </div>
+                <div class="comment-btns mt-2">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="pull-left">
+                                <button class="btn btn-danger btn-sm" id="id_huybo_comment">Hủy bỏ</button>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="pull-right">
+                                <button class="btn btn-success send btn-sm" id="id_send_comment">Gửi <i class="fa fa-long-arrow-right ml-1"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <h5 style="padding-top:30px;">Danh sách bình luận của khách hàng</h5>
+            <div class="container_comment">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function LoadComment() {
+        var list =@Html.Raw(Json.Encode(ViewBag.listdanhgiadichvuAI));
+        for (i = 0; i < list.length; i++) {
+            var TenKhachHang = list[i].TenKhachHang;
+            var NoiDungBinhLuan = list[i].NoiDungBinhLuan;
+            var Rate = list[i].Rate;
+            $('.container_comment').append(`
+                <div class="d-flex justify-content-center py-2">
+                    <div class="second py-2 px-2">
+                        <h5 class="text1">`+ NoiDungBinhLuan +`</h5>
+                        <div class="d-flex justify-content-between py-1 pt-2">
+                            <div><img src="../../Assets/Client/images/user_comment.png" width="18"><span class="text2">`+ TenKhachHang+`</span></div>
+                            <div id="id_checked_comment_`+ i +`">
+                                <span id="id_1_`+ i +`" class="fa fa-star"></span>
+                                <span id="id_2_`+ i +`" class="fa fa-star "></span>
+                                <span id="id_3_`+ i +`" class="fa fa-star "></span>
+                                <span id="id_4_`+ i +`" class="fa fa-star"></span>
+                                <span id="id_5_`+ i +`" class="fa fa-star"></span>
+                            </div>
+
+                        </div>
+                        <div class="phanhoi">
+                            <a href="#">Phản hồi</a>
+                        </div>
+                    </div>
+                </div>
+            `);
+            for (r = 0; r < Rate; r++) {
+                $('#id_'+(r+1)+'_'+i+'').addClass('checked');
+            }
+        }
+
+    }
+    $(document).ready(function () {
+        //load comment
+        LoadComment();
+
+
+
+
+        $('#id_send_comment').click(function () {
+            var rate = jQuery('.rating input[name="rating"]:checked').val();
+            var idDichVu =@ViewBag.IDDichVu;
+            var noidungcmt = $("#id_noidungcmt").val();
+            $.ajax({
+                type: "POST",
+                url: "/Client/DichVu/DanhGia",
+                data: { iddv: idDichVu, rate: rate, noidungcmt: noidungcmt },
+                success: function (json) {
+                    alert(json.mess);
+                    location.reload();
+                }
+            })
+        });
+        $('#id_huybo_comment').click(function () {
+            $("#id_noidungcmt").val("");
+        });
+
+    })
+</script>

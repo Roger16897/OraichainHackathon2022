@@ -1,0 +1,90 @@
+input[type=text], select {
+    width: 80%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+.tb3{
+    width: 107%;
+}
+.tb4 {
+    width: 105%;
+}
+.tb5 {
+    width: 104%;
+}
+.tb6 {
+    width: 100%;
+}
+textarea {
+    margin-left: 6px;
+    width: 94.5%;
+    height: 55%;
+}
+
+#id_khaithac {
+    text-align: center;
+    background-color: forestgreen;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    border: 0px;
+    margin-left: 8px;
+    width: 120px;
+    height: 40px;
+}
+#id_taomakhaithac {
+    text-align: center;
+    background-color: forestgreen;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    border: 0px;
+    width: 160px;
+    height: 40px;
+}
+#id_view_export {
+    text-align: center;
+    background-color: orangered;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    border: 0px;
+    margin-left: 8px;
+    width: 120px;
+    height: 40px;
+}
+#id_main_loading {
+    width: 100%;
+    height: 90%;
+    position: absolute;
+}
+
+#id_div_export {
+    border-style: dashed;
+    border-width: 4px;
+    border-top-color: #1aad19;
+    border-right-color: #3d4145;
+    border-bottom-color: #5340e6;
+    border-left-color: #f43530;
+    width: 50%;
+    height: 250px;
+    top: 35%;
+    left: 28%;
+    position: absolute;
+    display: none;
+    background-color: snow;
+}
+#id_wait_loading {
+    top: 43%;
+    left: 47%;
+    position: absolute;
+    display: none;
+}
+.disabled {
+    pointer-events: none;
+    opacity: 0.3;
+    transition:0.5s;
+}

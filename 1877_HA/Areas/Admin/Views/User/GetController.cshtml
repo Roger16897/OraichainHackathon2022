@@ -1,0 +1,131 @@
+﻿
+@{
+    ViewBag.Title = "GetController";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="page-header">
+    <h3 class="page-title">
+        <span class="page-title-icon bg-gradient-primary text-white mr-2">
+            <i class="mdi mdi-key"></i>
+        </span> Danh sách quyền
+    </h3>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <section class="panel">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <form action="CapNhatQuyen" method="post">
+                            <button type="submit" class="btn btn-primary" style="float:left" id="id_capnhat">Cập nhật</button>
+                        </form>
+                    </div>
+                    <div class="col-sm-9"></div>
+
+                </div>
+                <br />
+                <div id="grid"></div>
+            </div>
+        </section>
+    </div>
+</div>
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+            $("#id_ul_nguoidung").addClass("nav-expanded nav-active");
+        })
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#grid').dxDataGrid({
+                dataSource: DevExpress.data.AspNet.createStore({
+                    key: "ID",
+                    loadUrl: "/api/ApiController/Get",
+                    updateUrl: "/api/ApiController/Put",
+                    deleteUrl: "/api/ApiController/Delete",
+                    onBeforeSend: function (method, ajaxOptions) {
+                        ajaxOptions.xhrFields = {
+                            withCredentials: true
+                        };
+                    }
+                }),
+                remoteOperations: true,
+                rowAlternationEnabled: true,
+                filterRow: {
+                    visible: true
+                },
+                headerFilter: {
+                    visible: true
+                },
+                groupPanel: {
+                    visible: true
+                },
+                paging: {
+
+                    pageSize: 10
+                },
+                pager: {
+                    visible: true,
+                    allowedPageSizes: [5, 10, 20],
+                    showPageSizeSelector: true,
+                    showInfo: true,
+                    showNavigationButtons: true
+                },
+                showBorders: true,
+                editing: {
+                    allowAdding: false,
+                    allowUpdating: true,
+                    allowDeleting: true,
+                    useIcons: true
+                },
+                grouping: {
+                    autoExpandAll: false
+                },
+                columns: [
+                    {
+                        dataField: 'ControllerName',
+                        caption: 'Tên nghiệp vụ',
+                    },
+                    {
+                        dataField: 'MoTa',
+                        caption: 'Mô tả',
+                    }
+                ],
+                masterDetail: {
+                    enabled: true,
+                    template(container, options) {
+                        $('<div>')
+                            .dxDataGrid({
+                                columnAutoWidth: true,
+                                showBorders: true,
+                                columns: [
+                                    {
+                                        dataField: "ActionName",
+                                        caption: "Tên nghiệp vụ"
+                                    },
+                                    {
+                                        dataField: "MoTa",
+                                        caption: "Mô tả"
+                                    }
+                                ],
+                                dataSource: new DevExpress.data.AspNet.createStore({
+                                    key: "ID",
+                                    loadUrl: "/api/ApiController/GetActionByController?id=" + options.data.ID,
+                                    onBeforeSend: function (method, ajaxOptions) {
+                                        ajaxOptions.xhrFields = {
+                                            withCredentials: true
+                                        };
+                                    }
+                                })
+                            }).appendTo(container);
+                    },
+                },
+            });
+        });
+    </script>
+}
+
+
+

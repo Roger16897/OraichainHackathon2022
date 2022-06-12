@@ -1,0 +1,110 @@
+﻿
+@{
+    ViewBag.Title = "KetQuaAI";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="page-header">
+    <h3 class="page-title">
+        <span class="page-title-icon bg-gradient-primary text-white mr-2">
+            <i class="mdi mdi-database"></i>
+        </span> Danh mục các kết quả AI trả về
+    </h3>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <section class="panel">
+            <div id="grid"></div>
+        </section>
+    </div>
+</div>
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+
+            const dataGrid = $('#grid').dxDataGrid({
+                dataSource: DevExpress.data.AspNet.createStore({
+                    key: "ID",
+                    loadUrl: "/api/ApiKetQuaAI/Get",
+
+                    onBeforeSend: function (method, ajaxOptions) {
+                        ajaxOptions.xhrFields = {
+                            withCredentials: true
+                        };
+                    }
+                }),
+                selection: {
+                    mode: 'single',
+                },
+                remoteOperations: true,
+                rowAlternationEnabled: true,
+                filterRow: {
+                    visible: true
+                },
+                headerFilter: {
+                    visible: true
+                },
+                groupPanel: {
+                    visible: true
+                },
+                paging: {
+
+                    pageSize: 10
+                },
+                pager: {
+                    visible: true,
+                    allowedPageSizes: [5, 10, 20],
+                    showPageSizeSelector: true,
+                    showInfo: true,
+                    showNavigationButtons: true
+                },
+                showBorders: true,
+                editing: {
+                    allowAdding: false,
+                    allowUpdating: false,
+                    allowDeleting: false,
+                    useIcons: true
+                },
+                grouping: {
+                    autoExpandAll: false
+                },
+                columns: [
+                    {
+                        caption: "STT",
+                        visibleIndex: 0,
+                        width: 60,
+                        allowEditing: false,
+                        allowSearch: false,
+                        cellTemplate: function (cellElement, cellInfo) {
+                            $("<div>").append(($('#grid').dxDataGrid("instance").option('paging.pageIndex') || 0) * $('#grid').dxDataGrid("instance").option('paging.pageSize') + cellInfo.rowIndex + 1).appendTo(cellElement);
+                        }
+                    },
+                    {
+                        dataField: 'TenKetQua',
+                        caption: 'Tên kết quả',
+                    },
+                    {
+                        dataField: 'TenDichVu',
+                        caption: 'Tên dịch vụ',
+                    },
+                    {
+                        dataField: 'TenNguoiDung',
+                        caption: 'Thuộc khách hàng',
+                    },
+                    {
+                        dataField: 'KetQuaNhaCungCapAI',
+                        caption: 'Kết quả từ AI',
+                    },
+                    {
+                        dataField: "Hash",
+                        caption: "Hash",
+                    },
+
+                ],
+            });
+
+        });
+
+    </script>
+}

@@ -1,0 +1,95 @@
+﻿
+@{
+    ViewBag.Title = "UserAddRoleView";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+@section Header{
+    <link rel="stylesheet" type="text/css" href="~/Assets/Admin/flatlab/assets/jquery-multi-select/css/multi-select.css" />
+}
+@section Scripts
+{
+    <script src="~/Assets/Admin/flatlab/assets/fuelux/js/spinner.min.js"></script>
+    <script src="~/Assets/Admin/flatlab/assets/bootstrap-wysihtml5/bootstrap-wysihtml5.js"></script>
+    <script src="~/Assets/Admin/flatlab/assets/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+    <script src="~/Assets/Admin/flatlab/assets/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js"></script>
+    <script src="~/Assets/Admin/flatlab/assets/bootstrap-daterangepicker/moment.min.js"></script>
+    <script src="~/Assets/Admin/flatlab/assets/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <script src="~/Assets/Admin/flatlab/assets/bootstrap-colorpicker/js/bootstrap-colorpicker.js"></script>
+    <script src="~/Assets/Admin/flatlab/assets/bootstrap-timepicker/js/bootstrap-timepicker.js"></script>
+    <script src="~/Assets/Admin/flatlab/assets/jquery-multi-select/js/jquery.multi-select.js"></script>
+    <script src="~/Assets/Admin/flatlab/assets/jquery-multi-select/js/jquery.quicksearch.js"></script>
+    <script src="~/Assets/Admin/flatlab/js/advanced-form-components.js"></script>
+}
+
+<div class="page-header">
+    <h3 class="page-title">
+        <span class="page-title-icon bg-gradient-primary text-white mr-2">
+            <i class="mdi mdi-home"></i>
+        </span> Cấp quyền người dùng
+    </h3>
+    <nav aria-label="breadcrumb">
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">
+                <span></span>Overview <i class="mdi mdi-alert-circle-outline icon-sm text-primary align-middle"></i>
+            </li>
+        </ul>
+    </nav>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <section class="panel">
+            <div class="panel-body">
+                @using (Html.BeginForm("UserAddRoleApply", "User",new { area = "Admin" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group">
+                        @*<label class="control-label col-md-3">Danh sách quyền người dùng</label>*@
+                        <div class="row">
+                            <div class="col-sm-6" style="padding-left:40px;">Controller</div>
+                            <div class="col-sm-6" style="padding-left:60px;">Nghiệp vụ được cấp</div>
+                        </div>
+                        <br />
+                        <div class="col-md-12">
+                            <select multiple="multiple" class="multi-select" id="my_multi_select3" name="my_multi_select3[]">
+                                @foreach (var item in ViewBag.Controller)
+                                {
+                                    <optgroup label="@item.ControllerName">
+                                        @foreach (var item2 in ViewBag.Action)
+                                        {
+                                            if (item.ID == item2.ID_Controller)
+                                            {
+                                                var i = 0;
+                                                <text>
+                                                    @foreach (var item3 in ViewBag.Permission)
+                                                    {
+                                                        if (item2.ID == item3.Id_Action)
+                                                        {
+                                                            <option selected value="@item3.Id_Action">@item2.ActionName</option>
+                                                            i = 1;
+                                                        }
+                                                    }
+                                                </text>
+                                                if (i == 0)
+                                                {
+                                                    <option value="@item2.ID">@item2.ActionName</option>
+                                                }
+                                            }
+                                        }
+                                    </optgroup>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            <input type="submit" style="margin-left:10px" value="Lưu" class="btn btn-primary" />
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </section>
+    </div>
+</div>
+

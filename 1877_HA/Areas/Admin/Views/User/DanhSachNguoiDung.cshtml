@@ -1,0 +1,186 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="page-header">
+    <h3 class="page-title">
+        <span class="page-title-icon bg-gradient-primary text-white mr-2">
+            <i class="mdi mdi-account-box"></i>
+        </span> Danh sách người dùng
+    </h3>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <section class="panel">
+
+            <div class="panel-body">
+                <div class="row">
+
+                    <div class="col-sm-3">
+                        <button type="submit" class="btn btn-primary" id="id_capquyen" disabled>Cấp quyền</button>
+                    </div>
+                    <div class="col-sm-9"></div>
+
+
+                </div>
+                <br />
+                <div id="grid"></div>
+            </div>
+        </section>
+    </div>
+</div>
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+            var gioitinh = [{
+                "ID": "Nam",
+                "Name": "Nam"
+            }, {
+                "ID": "Nữ",
+                "Name": "Nữ"
+                }];
+            var loaitaikhoan = [
+                {
+                    "ID": "Quản trị",
+                    "Name": "Quản trị"
+                },
+                {
+                    "ID": "Chuyên gia",
+                    "Name": "Chuyên gia"
+                },
+                {
+                    "ID": "Nhà cung cấp AI",
+                    "Name": "Nhà cung cấp AI"
+                },
+                {
+                    "ID": "Khách hàng",
+                    "Name": "Khách hàng"
+                }];
+            var id_user = null;
+            const dataGrid = $('#grid').dxDataGrid({
+                dataSource: DevExpress.data.AspNet.createStore({
+                    key: "ID",
+                    loadUrl: "/api/ApiUser/Get",
+                    insertUrl: "/api/ApiUser/Post",
+                    updateUrl: "/api/ApiUser/Put",
+                    deleteUrl: "/api/ApiUser/Delete",
+                    onBeforeSend: function (method, ajaxOptions) {
+                        ajaxOptions.xhrFields = {
+                            withCredentials: true
+                        };
+                    }
+                }),
+                selection: {
+                    mode: 'single',
+                },
+                remoteOperations: true,
+                rowAlternationEnabled: true,
+                filterRow: {
+                    visible: true
+                },
+                headerFilter: {
+                    visible: true
+                },
+                groupPanel: {
+                    visible: true
+                },
+                paging: {
+
+                    pageSize: 10
+                },
+                pager: {
+                    visible: true,
+                    allowedPageSizes: [5, 10, 20],
+                    showPageSizeSelector: true,
+                    showInfo: true,
+                    showNavigationButtons: true
+                },
+                showBorders: true,
+                editing: {
+                    allowAdding: true,
+                    allowUpdating: true,
+                    allowDeleting: true,
+                    useIcons: true
+                },
+                grouping: {
+                    autoExpandAll: false
+                },
+                columns: [
+                    {
+                        caption: "STT",
+                        visibleIndex: 0,
+                        width: 60,
+                        allowEditing: false,
+                        allowSearch: false,
+                        cellTemplate: function (cellElement, cellInfo) {
+                            $("<div>").append(($('#grid').dxDataGrid("instance").option('paging.pageIndex') || 0) * $('#grid').dxDataGrid("instance").option('paging.pageSize') + cellInfo.rowIndex + 1).appendTo(cellElement);
+                        }
+                    },
+                    {
+                        dataField: 'TenDayDu',
+                        caption: 'Tên đầy đủ',
+                    },
+                    {
+                        dataField: 'TenDangNhap',
+                        caption: 'Tên đăng nhập',
+                    },
+                    {
+                        dataField: 'MatKhau',
+                        caption: 'Mật khẩu',
+                    },
+                    {
+                        dataField: "NgaySinh",
+                        caption: "Ngày sinh",
+                        dataType: "date",
+                        width: 200
+                    },
+                    {
+                        dataField: "GioiTinh",
+                        caption: "Giới tính",
+                        width: 200,
+                        lookup: {
+                            dataSource: gioitinh,
+                            displayExpr: "Name",
+                            valueExpr: "ID"
+                        }
+
+                    },
+                    {
+                        dataField: "Type",
+                        caption: "Loại tài khoản",
+                        width: 200,
+                        lookup: {
+                            dataSource: loaitaikhoan,
+                            displayExpr: "Name",
+                            valueExpr: "ID"
+                        }
+
+                    }
+                ],
+                onSelectionChanged(selectedItems) {
+                    const data = selectedItems.selectedRowsData;
+                    id_user = data[0].ID;
+                    $("#id_capquyen").attr("disabled", false);
+                },
+            });
+
+            //dataGrid.option('selection.selectAllMode')
+            $("#id_capquyen").click(function () {
+                if (id_user == null) {
+                    alert("Vui lòng chọn người dùng!");
+                }
+                else {
+                    var url = "/Admin/User/UserAddRoleView?ID=" + id_user;
+                    window.location.href = url;
+                }
+            });
+
+        });
+
+    </script>
+}
+
+

@@ -1,0 +1,178 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="TemplateMo">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700" rel="stylesheet">
+
+    <title>Host Cloud - Free HTML5 Bootstrap Template</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="~/Assets/Client/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" href="~/Assets/Client/css/fontawesome.css">
+    <link rel="stylesheet" href="~/Assets/Client/css/templatemo-host-cloud.css">
+    <link rel="stylesheet" href="~/Assets/Client/css/owl.css">
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <style>
+        .dropbtn {
+            color: white;
+            font-size: 16px;
+            border: none;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            text-align: left;
+            display: none;
+            position: absolute;
+            background-color: #f1f1f1;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+            .dropdown-content a {
+                color: black;
+                padding: 12px 16px;
+                text-decoration: none;
+                display: block;
+            }
+
+                .dropdown-content a:hover {
+                    background-color: #ddd;
+                }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+    </style>
+    <link href="~/Content/dx.light.css" rel="stylesheet" />
+    <link href="~/Content/dx.common.css" rel="stylesheet" />
+    @RenderSection("Header", required: false)
+
+</head>
+
+<body>
+
+    <!-- ***** Preloader Start ***** -->
+    <div id="preloader">
+        <div class="jumper">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+    <!-- ***** Preloader End ***** -->
+    <!-- Header -->
+    <header class="">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand" href="index.html"><h2>AI <em>Oraiconet</em></h2></a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item" id="id_trangchu_client">
+                            <a class="nav-link" href="/Client/Home/Index">Trang chủ</a>
+                        </li>
+                        <li class="nav-item" id="id_dichvu_client">
+                            <a class="nav-link" href="/Client/DichVu/Index">Dịch vụ</a>
+                        </li>
+                        <li class="nav-item" id="id_chuyengia_client">
+                            <a class="nav-link" href="/Client/ChuyenGia/Index">Chuyên gia</a>
+                        </li>
+                        <li class="nav-item" id="id_hotro_client">
+                            <a class="nav-link" href="/Client/About/Index">Hỗ trợ</a>
+                        </li>
+                        <li class="nav-item dropdown" id="id_yeucau_client">
+                            <a class="nav-link dropbtn" href="#">Xin chào: @Session["TenDangNhap"] </a>
+                            <div class="dropdown-content">
+                                <a href="#">Quản lý tài khoản</a>
+                                <a href="/Client/CongViec/Index">Danh sách yêu cầu</a>
+                                <a href="/Login/Logout">Đăng xuất</a>
+                            </div>
+                        </li>
+
+                    </ul>
+                </div>
+                <div class="functional-buttons">
+                    <ul>
+                        <li><a href="#">Kết nối tới ví</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Page Content -->
+    <!-- Banner Starts Here -->
+    <div class="banner">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
+                    <div class="header-text caption">
+                        <h3 style="color:white;padding-left: 100px;">Thị trường dịch vụ AI kết hợp chuyên gia trên nền tảng oraichain blockchain</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*<div class="pricing-section">
+            <div class="container">
+                @RenderBody()
+            </div>
+        </div>*@
+    <div>
+        <div class="container">
+            @RenderBody()
+        </div>
+    </div>
+    <!-- Footer Starts Here -->
+    <br />
+    <br /><br />
+    <footer>
+        <div class="container">
+            <div class="col-md-12">
+                <div class="text-center">
+                    <p>Designed by <a rel="nofollow" href="https://templatemo.com" style="color:violet">1877 Team</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Footer Ends Here -->
+    <!-- Bootstrap core JavaScript -->
+    @RenderSection("Scripts", required: false)
+    <script src="~/Assets/Client/vendor/jquery/jquery.min.js"></script>
+    <script src="~/Assets/Client/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Additional Scripts -->
+    <script src="~/Assets/Client/js/custom.js"></script>
+    <script src="~/Assets/Client/js/owl.js"></script>
+    <script src="~/Assets/Client/js/accordions.js"></script>
+    <script src="~/Scripts/dx.all.js"></script>
+    <script src="~/Scripts/aspnet/dx.aspnet.data.js"></script>
+
+    <script language="text/Javascript">
+        cleared[0] = cleared[1] = cleared[2] = 0; //set a cleared flag for each field
+        function clearField(t) {                   //declaring the array outside of the
+            if (!cleared[t.id]) {                      // function makes it static and global
+                cleared[t.id] = 1;  // you could use true and false, but that's more typing
+                t.value = '';         // with more chance of typos
+                t.style.color = '#fff';
+            }
+        }
+    </script>
+
+</body>
+</html>
